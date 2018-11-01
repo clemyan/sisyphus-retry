@@ -2,9 +2,9 @@
   "name": "sisyphus-retry",
   "version": "0.1.0",
   "description": "Lightweight library for retrying asynchronous tasks with fluent API",
-  "main": "dist/cjs/index.js",
-  "module": "dist/es/index.js",
-  "unpkg": "dist/index.js",
+  "main": "dist/cjs/sisyphus.js",
+  "module": "dist/es/sisyphus.js",
+  "unpkg": "dist/sisyphus.js",
   "files": [
     "dist/"
   ],
