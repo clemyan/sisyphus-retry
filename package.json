@@ -1,0 +1,45 @@
+{
+  "name": "sisyphus-retry",
+  "version": "0.1.0",
+  "description": "Lightweight library for retrying asynchronous tasks with fluent API",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
+  "unpkg": "dist/index.js",
+  "files": [
+    "dist/"
+  ],
+  "homepage": "https://github.com/clemyan/sisyphus-retry",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clemyan/sisyphus-retry.git"
+  },
+  "bugs": "https://github.com/clemyan/sisyphus-retry/issues",
+  "scripts": {
+    "test": "jest --config config/jest.config.js",
+    "test:watch": "npm run --silent test -- --watchAll",
+    "lint": "eslint **/*.js",
+    "lint:fix": "npm run --silent lint -- --fix",
+    "build": "rollup -c config/rollup.config.js",
+    "build:watch": "npm run --silent build -- --watch",
+    "prepublishOnly": "npm run --silent build && npm test"
+  },
+  "keywords": [
+    "retry",
+    "async",
+    "promise",
+    "fluent",
+    "chaining",
+    "fetch",
+    "await"
+  ],
+  "author": "Clement Yan <yanclement94@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "eslint": "^5.8.0",
+    "jest": "^23.6.0",
+    "rollup": "^0.66.6",
+    "rollup-plugin-babel-minify": "^6.1.1",
+    "rollup-plugin-replace": "^2.1.0"
+  }
+}
