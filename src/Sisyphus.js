@@ -1,4 +1,13 @@
-import { delay, delegate } from './utils'
+import { delegate } from './utils'
+
+const retry = (task, times, wait, attempt) =>
+	task().catch(err => {
+		if(attempt + 1 >= times) {
+			throw err
+		}
+		return new Promise(resolve => setTimeout(resolve, wait(attempt)))
+			.then(() => retry(task, times, wait, attempt + 1))
+	})
 
 class Sisyphus {
 	constructor() {
@@ -55,16 +64,8 @@ class Sisyphus {
 		}
 	} 
 
-	$() {
-		return (function retry(task, times, wait, attempt) {
-			return task().catch(err => {
-				if(attempt + 1 >= times) {
-					throw err
-				}
-				return delay(wait(attempt)).then(() => retry(task, times, wait, attempt + 1))
-			})
-		})(this._task, this._times, this._wait, 0)
-	}
+	now() { return retry(this._task, this._times, this._wait, 0) }
+	get $() { return this.now }
 }
 
 const _delegate = delegate(Object.getOwnPropertyNames(Sisyphus.prototype))
