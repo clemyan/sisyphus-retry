@@ -54,7 +54,7 @@ class Sisyphus {
 				}, this)
 			},
 			exponentially: (start = 0, factor = 1) => {
-				this._wait = retry => start + Math.pow(factor, retry)
+				this._wait = retry => start * Math.pow(factor, retry)
 				return _delegate({
 					startingAt: function(value) { start  = value; return this },
 					withFactor: function(value) { factor = value; return this },
