@@ -1,6 +1,8 @@
-# [WIP] sisyphus-retry
+# sisyphus-retry
 
-Lightweight library for retrying asynchronous tasks with fluent API
+Lightweight library for retrying asynchronous tasks with fluent API.
+
+Based on [this reddit comment](https://www.reddit.com/r/javascript/comments/922sei/async_retries/e32ydln/).
 
 ## Usage
 
@@ -15,25 +17,25 @@ const pushBoulder = () =>
 const fetchData = () => axios.get('/url/to/data')
 
 sisyphus()
-	.triesTo(pushBoulder) // Sets the task
-	.indefinitely()       // Max # of attempts = Infinity
-	.waiting(100).ms      // Wait 100 ms in between attempts
-	.now()                // Go
+    .triesTo(pushBoulder) // Sets the task
+    .indefinitely()       // Max # of attempts = Infinity
+    .waiting(100).ms      // Wait 100 ms in between attempts
+    .now()                // Go
 
 sisyphus()
-	.triesTo(fetchData)     // Sets the task
-	.trying(5).times        // Max # of attempts = 5
-	.backingOff()           // Exponential backoff
-		.exponentially()
-		.startingAt(100).ms
-		.withFactor(2)
-	.now()                  // Returns promise:
-	.then(function(response) {
-		// ...
-	})
-	.catch(function(err) {
-		// ...
-	})
+    .triesTo(fetchData)     // Sets the task
+    .trying(5).times        // Max # of attempts = 5
+    .backingOff()           // Exponential backoff
+        .exponentially()
+        .startingAt(100).ms
+        .withFactor(2)
+    .now()                  // Returns promise:
+    .then(function(response) {
+        // ...
+    })
+    .catch(function(err) {
+        // ...
+    })
 ```
 
 ## API
@@ -71,21 +73,23 @@ Sets the task (re)tried by the Sisyphus instance
 
 *Alias: `.$`*
 
-Starts the initial attempt of the async task. `.now()` returns a promise. If any attempt succeeds, the promise is resolved with the same value as the task. If the maximum number of attempts is reached without a successful attempt, the promise is rejected with the same reason as the last attempt.
+Starts the initial attempt of the async task.
+
+`.now()` returns a promise. If and when any attempt succeeds, the promise is resolved with the same value as the task. If the maximum number of attempts is reached without a successful attempt, the promise is rejected with the same reason as the last attempt.
 
 ----
 
 ### Max attempts
 
-Sisyphus instances by default retries its task indefinitely, but they can also be configured to retrying only up to a finite number of times.
+Sisyphus instances by default retry their tasks indefinitely, but they can also be configured to retry only up to a finite number of times.
 
 #### `.trying(num)`
 
-Sets the maximum number of attempt. Note that this includes the initial attempt.
+Sets the maximum number of attempt. This includes the initial attempt.
 
 #### `.once()`, `.twice()`, `.thrice()`, `.indefinitely()`, `.infinte()`
 
-These convenience methods sets the maximum number of attempt to the corresponding value.
+These convenience methods set the maximum number of attempts to the corresponding value.
 
 ----
 
@@ -95,7 +99,7 @@ Sisyphus instances can also be configured to wait a certain amount of time betwe
 
 #### `.waiting(fn)`
 
-This sets a function to calculate the wait time. The function is called with the attempt number that just failed, with the initial attempt being the 0<sup>th</sup> attempt, and returns the number of milliseconds before it should retry the task.
+This sets a function to calculate the wait time. The function is called with the attempt number that just failed, with the initial attempt being the 0<sup>th</sup> attempt, and should return the number of milliseconds to wait before the next attempt.
 
 ```javascript
 // Constant wait time
@@ -117,9 +121,9 @@ A convenience method for a constant wait time, given in milliseconds
 
 #### `.backingOff()`
 
-This method returns a "backoff" object with methods to configure the wait time with some common backoff strategies.
+This method returns a "backoff object" with methods to configure the wait time with some common backoff strategies.
 
-Unless specified otherwise, this "backoff" object and the backoff strategy objects delegates properties back to the Sisyphus instance. This allows one to "escape" the backoff configuration and "go back" to the Sisyphus instance seamlessly.
+Unless specified otherwise, this backoff object and the backoff strategy objects delegate properties and method calls back to the Sisyphus instance. This allows one to "escape" the backoff configuration and "go back" to the Sisyphus instance seamlessly.
 
 #### `.backingOff().linearly([start, [increment]])`
 
@@ -127,7 +131,7 @@ Linear backoff. The wait time after the initial attempt is `start` milliseconds.
 
 `start` and `increment` both defaults to 0.
 
-This method returns a "strategy" object that has `.startingAt(ms)` and `.incrementingBy(ms)` methods to reconfigure the linear backoff fluently. Both methods are chainable.
+This method returns a "strategy object" that has `.startingAt(ms)` and `.incrementingBy(ms)` methods to reconfigure the linear backoff fluently. Both methods are chainable.
 
 The `.ms` property of a linear backoff strategy object is a reference to the strategy object itself, rather than the Sisyphus instance.
 
