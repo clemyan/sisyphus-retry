@@ -1,8 +1,30 @@
 # sisyphus-retry
 
+[![npm](https://img.shields.io/npm/v/sisyphus-retry.svg?longCache=true&style=flat-square)](https://www.npmjs.com/package/sisyphus-retry)
+[![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/sisyphus-retry.svg?longCache=true&style=flat-square&label=min%2Bgzip)](https://bundlephobia.com/result?p=sisyphus-retry)
+[![GitHub](https://img.shields.io/github/license/clemyan/sisyphus-retry.svg?longCache=true&style=flat-square)](https://github.com/clemyan/sisyphus-retry/blob/master/LICENSE)
+
 Lightweight library for retrying asynchronous tasks with fluent API.
 
 Based on [this reddit comment](https://www.reddit.com/r/javascript/comments/922sei/async_retries/e32ydln/).
+
+## Installation
+
+### npm
+
+```bash
+$ npm install sisyphus-retry
+# or
+$ yarn add sisyphus-retry
+# or
+$ pnpm install sisyphus-retry
+```
+
+### UNPKG
+
+```html
+<script src="https://unpkg.com/sisyphus-retry"></script>
+```
 
 ## Usage
 

@@ -4,7 +4,7 @@
   "description": "Lightweight library for retrying asynchronous tasks with fluent API",
   "main": "dist/cjs/sisyphus.js",
   "module": "dist/es/sisyphus.js",
-  "unpkg": "dist/sisyphus.js",
+  "unpkg": "dist/umd/sisyphus.js",
   "files": [
     "dist/"
   ],
