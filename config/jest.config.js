@@ -2,7 +2,7 @@ module.exports = {
 	displayName: 'test',
 	rootDir: '..',
 	testMatch: ['<rootDir>/test/**/*.js'],
-	testPathIgnorePatterns: ['/node_modules/', '.eslintrc.js', '<rootDir>/test/utils/'],
+	testPathIgnorePatterns: ['/node_modules/', '.eslintrc.js', '<rootDir>/test/utils.js'],
 	testEnvironment: 'node',
 	moduleNameMapper: {
 		'^src(.+)': '<rootDir>/src$1',

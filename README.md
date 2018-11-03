@@ -62,12 +62,7 @@ Sisyphus instances defaults to a task that always succeeds immediately.
 
 *Alias: `.tries`*
 
-Sets the task (re)tried by the Sisyphus instance
-
-
-----
-
-### Execution
+Sets the task to be run by the Sisyphus instance
 
 #### `.now()`
 
@@ -85,7 +80,7 @@ Sisyphus instances by default retry their tasks indefinitely, but they can also 
 
 #### `.trying(num)`
 
-Sets the maximum number of attempt. This includes the initial attempt.
+Sets the maximum number of attempt. This includes the initial attempt. If num is zero or negative, behavior is unspecified.
 
 #### `.once()`, `.twice()`, `.thrice()`, `.indefinitely()`, `.infinte()`
 
@@ -96,6 +91,8 @@ These convenience methods set the maximum number of attempts to the correspondin
 ### Wait time / Backoff
 
 Sisyphus instances can also be configured to wait a certain amount of time between an attempt failing and starting the next attempt, or even increase the wait time as it retries the task.
+
+Sisyphus instances default to no wait time.
 
 #### `.waiting(fn)`
 
