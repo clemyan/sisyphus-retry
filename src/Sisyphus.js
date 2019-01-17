@@ -1,5 +1,3 @@
-import { delegate } from './utils'
-
 const retry = (task, times, wait, attempt) =>
 	task().catch(err => {
 		if(attempt + 1 >= times) {
@@ -16,12 +14,14 @@ class Sisyphus {
 		this._times = Infinity
 	}
 
+	// Tasks
 	triesTo(task) {
 		this._task = task
 		return this
 	}
 	get tries() { return this.triesTo }
 
+	// Attempts
 	trying(times) {
 		this._times = times
 		return this
@@ -34,40 +34,17 @@ class Sisyphus {
 	indefinitely() { return this.trying(Infinity) }
 	get infinite() { return this.indefinitely }
 
+	// Wait
 	waiting(fn) {
 		this._wait = fn
 		return this
 	}
-	every(ms) {
-		this._wait = () => ms
-		return this
-	}
 	get ms() { return this }
-	backingOff() {
-		return {
-			linearly: (start = 0, increment = 0) => {
-				this._wait = retry => start + retry * increment
-				return _delegate({
-					startingAt:     function(ms) { start     = ms; return this },
-					incrementingBy: function(ms) { increment = ms; return this },
-					get ms() { return this }
-				}, this)
-			},
-			exponentially: (start = 0, factor = 1) => {
-				this._wait = retry => start * Math.pow(factor, retry)
-				return _delegate({
-					startingAt: function(value) { start  = value; return this },
-					withFactor: function(value) { factor = value; return this },
-					get ms() { return this }
-				}, this)
-			}
-		}
-	} 
+	get backingOff() { return this.waiting }
+	every(ms) { return this.waiting(() => ms) }
 
 	now() { return retry(this._task, this._times, this._wait, 0) }
 	get $() { return this.now }
 }
-
-const _delegate = delegate(Object.getOwnPropertyNames(Sisyphus.prototype))
 
 export default Sisyphus
