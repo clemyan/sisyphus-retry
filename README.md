@@ -10,6 +10,33 @@ Based on [this reddit comment](https://www.reddit.com/r/javascript/comments/922s
 
 ## Installation
 
+### Formats
+
+`sisyphus-retry` distributes in a number of formats.
+
+|                                   | Format               | Minified?          | Main use case  |
+| --------------------------------- | -------------------- |:------------------:| -------------- |
+| [source](#source)                 | ES2015 module        | :x:                | Bundler        |
+| [es](#es2015-module)              | ES2015 module        | :heavy_check_mark: | Modern browser |
+| [cjs](#commonjs)                  | CommonJS             | :heavy_check_mark: | Node           |
+| [global](#global-variable-export) | Global var export    | :heavy_check_mark: | Browser        |
+
+#### Source
+
+For being built by a ES2015-aware bundler since those work better using unminfied source. A bundler that respects the "module" package.json field (e.g. Webpack 2+, rollup) will use this distributable.
+
+#### ES2015 module
+
+Minified ES2015 module. This is for importing in the modern browsers that [support](https://caniuse.com/#feat=es6-module) `<script type=module>`. See the [Broswer](#modern-broswer) section.
+
+#### CommonJS
+
+Mainly for `require` from NodeJS, which uses this distributable because of the package.json "main" field.
+
+#### Global variable export
+
+This exports to the `sisyphus` global variable. Mainly for being used from a broswer via `<script>`.
+
 ### npm
 
 ```bash
@@ -20,16 +47,58 @@ $ yarn add sisyphus-retry
 $ pnpm install sisyphus-retry
 ```
 
-### UNPKG
+The npm package includes all formats
+
+### Modern browsers
+
+If you only target modern browsers that [support ES2015 modules](https://caniuse.com/#feat=es6-module).
 
 ```html
-<script src="https://unpkg.com/sisyphus-retry"></script>
+<script type="module">
+import sisyphus from '//unpkg.com/sisyphus-retry/dist/sisyphus.es.js'
+// Your code
+</script>
+
+<!-- or, for a specific version -->
+
+<script type="module">
+import sisyphus from '//unpkg.com/sisyphus-retry@0.1.0/dist/sisyphus.es.js'
+// Your code
+</script>
 ```
+
+### Browsers
+
+If you target browsers that don't support ES2015 modules, either use the global variable bundle
+
+```html
+<script src="//unpkg.com/sisyphus-retry"></script>
+<!-- or, for a specific version -->
+<script src="//unpkg.com/sisyphus-retry@0.1.0"></script>
+```
+
+or use a fallback
+
+```html
+<script type="module">
+import sisyphus from '//unpkg.com/sisyphus-retry/dist/sisyphus.es.js'
+window.sisyphus = sisyphus
+</script>
+<script src="//unpkg.com/sisyphus-retry" nomodule></script>
+<script>
+// Now sisyphus is defined as a global
+</script>
+```
+
+Like above, you can use a specific version by adding specifiers
 
 ## Usage
 
+### Example
+
 ```javascript
 import sisyphus from 'sisyphus-retry'
+import exponentially from 'sisyphus-retry/dist/wait/exponentially.es.js'
 
 // A task that never succeeds
 const pushBoulder = () =>
@@ -39,86 +108,67 @@ const pushBoulder = () =>
 const fetchData = () => axios.get('/url/to/data')
 
 sisyphus()
-    .triesTo(pushBoulder) // Sets the task
-    .indefinitely()       // Max # of attempts = Infinity
-    .waiting(100).ms      // Wait 100 ms in between attempts
-    .now()                // Go
+	.triesTo(pushBoulder) // Sets the task
+	.indefinitely()       // Max # of attempts = Infinity
+	.every(100).ms        // Wait 100 ms in between attempts
+	.now()                // Go
 
 sisyphus()
-    .triesTo(fetchData)     // Sets the task
-    .trying(5).times        // Max # of attempts = 5
-    .backingOff()           // Exponential backoff
-        .exponentially()
-        .startingAt(100).ms
-        .withFactor(2)
-    .now()                  // Returns promise:
-    .then(function(response) {
-        // ...
-    })
-    .catch(function(err) {
-        // ...
-    })
+	.triesTo(fetchData)         // Sets the task
+	.trying(5).times            // Max # of attempts = 5
+	.backingOff(exponentially() // Exponential backoff
+		.startingAt(100).ms
+		.withFactor(2))
+	.now()                      // Returns promise:
+	.then(function(response) {
+		// ...
+	})
+	.catch(function(err) {
+		// ...
+	})
 ```
 
-## API
-
-### `sisyphus()`
-
-Creates a new Sisyphus instance. Do not use the `new` keyword.
-
-----
-
-### Fluent no-ops
-
-The properties `.time`, `.times`, and `.ms` are references back to the Sisyphus instance. These are provided simply for fluency.
-
-----
+## Introduction
 
 ### Tasks
 
-In Sisyphus, an async task is a function that returns a promise to relay success/failure. Sisyphus retries async tasks (by calling the function again) for you if the promise rejects.
+In Sisyphus, an **async task** (or simply task) is a function that, when called with no arguments, returns a promise. A call of a task is known as an **attempt**. If and when the promise fulfills with some value, the task is said to succeed with that value. On the other hand, if and when the promise rejects with some reason, the task is said to fail with that reason.
 
-Sisyphus instances defaults to a task that always succeeds immediately.
+A Sisyphus instance attempts the given task until an attempt succeeds or until a configured maximum number of attempts is reached.
 
-#### `.triesTo(task)`
+## API
 
-*Alias: `.tries`*
+### Creation
 
-Sets the task to be run by the Sisyphus instance
+#### `sisyphus()`
 
-#### `.now()`
+Creates and returns a Sisyphus instance. Note that due to the fluent api, it is usually unnecessary to assign the instance to a variable.
 
-*Alias: `.$`*
+### Properties
 
-Starts the initial attempt of the async task.
+#### Fleunt no-ops
 
-`.now()` returns a promise. If and when any attempt succeeds, the promise is resolved with the same value as the task. If the maximum number of attempts is reached without a successful attempt, the promise is rejected with the same reason as the last attempt.
+The `.ms`, `.time` and `.times` properties are references back to the instance. They are provided simply for fluency.
 
-----
+### Instance methods
 
-### Max attempts
+All instance methods, except otherwise sepcified, returns the instance.
 
-Sisyphus instances by default retry their tasks indefinitely, but they can also be configured to retry only up to a finite number of times.
+#### `.triesTo(task)`, `.tries(task)`
+
+Sets the task to be run by the Sisyphus instance. The default task (the one set on instance creation) is one that succeeds with `undefined` immediately.
 
 #### `.trying(num)`
 
-Sets the maximum number of attempt. This includes the initial attempt. If num is zero or negative, behavior is unspecified.
+Sets the maximum number of attempts. If num is zero or negative, behavior is unspecified. The default  maximum is infinite (no limit).
 
 #### `.once()`, `.twice()`, `.thrice()`, `.indefinitely()`, `.infinte()`
 
 These convenience methods set the maximum number of attempts to the corresponding value.
 
-----
+#### `.waiting(fn)`, `.backingOff(fn)`
 
-### Wait time / Backoff
-
-Sisyphus instances can also be configured to wait a certain amount of time between an attempt failing and starting the next attempt, or even increase the wait time as it retries the task.
-
-Sisyphus instances default to no wait time.
-
-#### `.waiting(fn)`
-
-This sets a function to calculate the wait time. The function is called with the attempt number that just failed, with the initial attempt being the 0<sup>th</sup> attempt, and should return the number of milliseconds to wait before the next attempt.
+This sets a function to calculate a wait time between attempts. The function is called with the attempt number that just failed, with the initial attempt being the 0<sup>th</sup> attempt, and should return the number of milliseconds to wait before the next attempt.
 
 ```javascript
 // Constant wait time
@@ -136,33 +186,71 @@ sisyphus().waiting(n => Math.floor(1000 * n * Math.random()))
 
 A convenience method for a constant wait time, given in milliseconds
 
-----
+#### `.now()`, `.$()`
 
-#### `.backingOff()`
+Runs the task with retries. Returns a promise.
 
-This method returns a "backoff object" with methods to configure the wait time with some common backoff strategies.
+Since the `.now` takes no arguments (although it requires the Sisyphus instance as `this`) and returns a promise, it can itself be thought of as a task -- one that succeeds with the same value if and when any attempt of the inner task succeeds.
 
-Unless specified otherwise, this backoff object and the backoff strategy objects delegate properties and method calls back to the Sisyphus instance. This allows one to "escape" the backoff configuration and "go back" to the Sisyphus instance seamlessly.
+If the Sisyphus instance has no maximum attempt limit, then the outer task never fails. If the Sisyphus instance has a maximum attempt limit, then the outer task fails with the same reason if and when the last attempt of the inner task fails.
 
-#### `.backingOff().linearly([start, [increment]])`
+The high-level algorithm of the outer task is:
 
-Linear backoff. The wait time after the initial attempt is `start` milliseconds. Each subsequent attempt has wait time `increment` milliseconds more than the last.
+1. Attempt the inner task
+2. If attempt succeeds, the outer task succeeds with the same value as this attempt. END
+3. If attempt fails, and the number of attempts finished >= configured maximum, the outer task fails with the same reason as this attempt. END
+4. Otherwise, call the wait function to get the wait time
+5. Wait that many milliseconds
+6. Go back to step 1
+
+**Note on concurrency**: Between calling `.now`/`.$` and the return promise settles, do not change any configuration of that Sisyphus instance or call  `.now`/`.$` again. The behavior after doing so is unspecified.
+
+## Wait time addons
+
+Sisyphus includes some fluently-configurable wait functions.
+
+|        | Linear Backoff              | Exponential Backoff              |
+| ------ | --------------------------- | -------------------------------- |
+| source | `src/wait/linearly.js`      | `src/wait/exponentially.js`      |
+| es     | `dist/wait/linearly.es.js`  | `dist/wait/exponentially.es.js`  |
+| cjs    | `dist/wait/linearly.cjs.js` | `dist/wait/exponentially.cjs.js` |
+| extend | `dist/wait/linearly.js`     | `dist/wait/exponentially.js`     |
+
+For the npm package, the above paths are relative to the package root. For UNPKG, the paths are relative to `//unpkg.com/sisyphus-retry`.
+
+The "extend" format is to be used with the "global" main format. They find a `sisyphus` global variable and exports to `sisyphus.wait.linear` and `sisyphus.wait.exponentially` respectively.
+
+### Linear Backoff
+
+#### `linearly([start, [increment]])`
+
+Returns a linear backoff function. The wait time after the initial attempt is `start` milliseconds. Each subsequent attempt has wait time `increment` milliseconds more than the last.
 
 `start` and `increment` both defaults to 0.
 
-This method returns a "strategy object" that has `.startingAt(ms)` and `.incrementingBy(ms)` methods to reconfigure the linear backoff fluently. Both methods are chainable.
+#### Properties
 
-The `.ms` property of a linear backoff strategy object is a reference to the strategy object itself, rather than the Sisyphus instance.
+The `.ms` property of a linear backoff function is a reference to the function itself
 
-#### `.backingOff().exponentially([start, [factor]])`
+#### Instance methods
 
-Exponential backoff. The wait time after the initial attempt is `start` milliseconds. Each subsequent attempt has wait time equal to the last one multiplied by `factor` .
+The linear backoff functions also have `.startingAt(ms)` and `.incrementingBy(ms)` methods to reconfigure the linear backoff fluently.
+
+### Exponential Backoff
+
+#### `exponentially([start, [factor]])`
+
+Returns an exponential backoff function. The wait time after the initial attempt is `start` milliseconds. Each subsequent attempt has wait time equal to the last one multiplied by `factor`.
 
 `start` and `factor` defaults to 0 and 1, respectively.
 
-This method returns a "strategy" object that has `.startingAt(ms)` and `.withFactor(factor)` methods to reconfigure the exponential backoff fluently. Both methods are chainable.
+#### Properties
 
-The `.ms` property of an exponential backoff strategy object is a reference to the strategy object itself, rather than the Sisyphus instance.
+The `.ms` property of an exponential backoff function is a reference to the function itself
+
+#### Instance methods
+
+The exponential backoff functions also have  `.startingAt(ms)` and `.withFactor(factor)` methods to reconfigure the exponential backoff fluently.
 
 ## Sisyphus?
 
