@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "description": "Lightweight library for retrying asynchronous tasks with fluent API",
   "main": "dist/sisyphus.cjs.js",
-  "module": "dist/sisyphus.es.js",
+  "module": "src/index.js",
   "unpkg": "dist/sisyphus.js",
   "files": [
-    "dist/"
+    "dist/",
+    "src/"
   ],
   "homepage": "https://github.com/clemyan/sisyphus-retry",
   "repository": {
