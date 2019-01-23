@@ -1,7 +1,7 @@
 # sisyphus-retry
 
-[![npm](https://img.shields.io/npm/v/sisyphus-retry.svg?longCache=true&style=flat-square)](https://www.npmjs.com/package/sisyphus-retry)
-[![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/sisyphus-retry.svg?longCache=true&style=flat-square&label=min%2Bgzip)](https://bundlephobia.com/result?p=sisyphus-retry)
+[![npm](https://img.shields.io/npm/v/sisyphus-retry.svg?style=flat-square)](https://www.npmjs.com/package/sisyphus-retry)
+[![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/sisyphus-retry.svg?style=flat-square&label=min%2Bgzip)](https://bundlephobia.com/result?p=sisyphus-retry)
 [![GitHub](https://img.shields.io/github/license/clemyan/sisyphus-retry.svg?longCache=true&style=flat-square)](https://github.com/clemyan/sisyphus-retry/blob/master/LICENSE)
 
 Lightweight library for retrying asynchronous tasks with fluent API.
@@ -62,7 +62,7 @@ import sisyphus from '//unpkg.com/sisyphus-retry/dist/sisyphus.es.js'
 <!-- or, for a specific version -->
 
 <script type="module">
-import sisyphus from '//unpkg.com/sisyphus-retry@0.1.0/dist/sisyphus.es.js'
+import sisyphus from '//unpkg.com/sisyphus-retry@0.2.0/dist/sisyphus.es.js'
 // Your code
 </script>
 ```
@@ -74,7 +74,7 @@ If you target browsers that don't support ES2015 modules, either use the global 
 ```html
 <script src="//unpkg.com/sisyphus-retry"></script>
 <!-- or, for a specific version -->
-<script src="//unpkg.com/sisyphus-retry@0.1.0"></script>
+<script src="//unpkg.com/sisyphus-retry@0.2.0"></script>
 ```
 
 or use a fallback
